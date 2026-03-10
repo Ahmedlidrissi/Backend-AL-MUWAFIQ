@@ -1,62 +1,19 @@
 const express = require('express');
-const Workout = require('../models/Workout');
+const gymController = require('../controllers/gymController');
+const gymProgramController = require('../controllers/gymProgramController');
 const authMiddleware = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-// All routes require authentication
 router.use(authMiddleware);
 
-/**
- * POST /api/gym/sync
- * Bulk upsert workouts from the frontend.
- * Body: { items: [{ clientSideId, dayOfWeek, exercises, isDeleted }, ...] }
- */
-router.post('/sync', async (req, res) => {
-    try {
-        const { items } = req.body;
+// Workout logs (completion tracking)
+router.get('/', (req, res) => gymController.getAll(req, res));
+router.post('/sync', (req, res) => gymController.sync(req, res));
 
-        if (!Array.isArray(items) || items.length === 0) {
-            return res.status(400).json({ error: 'items array is required and must not be empty.' });
-        }
-
-        const results = await Promise.all(
-            items.map((item) =>
-                Workout.findOneAndUpdate(
-                    { userId: req.user, clientSideId: item.clientSideId },
-                    {
-                        ...item,
-                        userId: req.user,
-                        updatedAt: Date.now(),
-                    },
-                    { upsert: true, new: true, runValidators: true }
-                )
-            )
-        );
-
-        res.json({ synced: results.length, items: results });
-    } catch (err) {
-        console.error('Gym sync error:', err);
-        res.status(500).json({ error: 'Server error during workout sync.' });
-    }
-});
-
-/**
- * GET /api/gym
- * Fetch all non-deleted workouts for the authenticated user.
- */
-router.get('/', async (req, res) => {
-    try {
-        const workouts = await Workout.find({
-            userId: req.user,
-            isDeleted: { $ne: true },
-        }).sort({ updatedAt: -1 });
-
-        res.json(workouts);
-    } catch (err) {
-        console.error('Workout fetch error:', err);
-        res.status(500).json({ error: 'Server error fetching workouts.' });
-    }
-});
+// Program templates (exercises, sequences, etc.)
+router.get('/program', (req, res) => gymProgramController.getProgram(req, res));
+router.post('/program/sync', (req, res) => gymProgramController.syncProgram(req, res));
+router.delete('/program', (req, res) => gymProgramController.deleteProgram(req, res));
 
 module.exports = router;
