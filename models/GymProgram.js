@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 
 const exerciseSchema = new mongoose.Schema(
     {
-        id: { type: String, required: true },
-        name: { type: String, required: true },
-        sets: { type: String, default: '' },
-        reps: { type: String, default: '' },
+        id: { type: String, required: false },
+        name: { type: String, required: false },
+        sets: { type: mongoose.Schema.Types.Mixed, default: [] },
+        reps: { type: mongoose.Schema.Types.Mixed, default: '' },
     },
     { _id: false }
 );
