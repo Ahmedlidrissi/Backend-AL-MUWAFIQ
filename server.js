@@ -2,11 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const port = process.env.PORT || 5000;
-
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server is running smoothly on port ${PORT}`);
-});
+const PORT = process.env.PORT || 5000;
 // Route imports
 const authRoutes = require('./routes/auth');
 const taskRoutes = require('./routes/tasks');
@@ -31,7 +27,6 @@ app.get('/api/health', (_req, res) => {
 });
 
 // ─── Start ───────────────────────────────────────────────────────────────────
-const PORT = process.env.PORT || 5000;
 
 // Connect to MongoDB
 mongoose
@@ -39,12 +34,12 @@ mongoose
     .then(() => console.log('✅ Connected to MongoDB'))
     .catch((err) => console.error('❌ MongoDB connection error:', err.message));
 
-// Only start the server locally if not running in Vercel
-if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
-    app.listen(PORT, () => {
+// Start the server unless running in Vercel serverless mode
+if (!process.env.VERCEL) {
+    app.listen(PORT, '0.0.0.0', () => {
         console.log(`🚀 Server running on port ${PORT}`);
     });
 }
 
-// Export the Express API for Vercel
+// Export the Express API for Vercel or tests
 module.exports = app;
