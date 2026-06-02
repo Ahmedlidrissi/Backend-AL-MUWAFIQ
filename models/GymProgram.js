@@ -34,6 +34,19 @@ const gymProgramSchema = new mongoose.Schema(
         anchorDate: { type: String, default: '' },
         sequence: { type: [String], default: [] },
         routineTemplates: { type: Map, of: routineTemplateSchema, default: {} },
+        scheduleType: {
+            type: String,
+            enum: ["rolling", "weekly"],
+            default: "rolling"
+        },
+        weeklySchedule: {
+            type: mongoose.Schema.Types.Mixed,
+            default: {}
+        },
+        weekStartDay: {
+            type: String,
+            default: "Monday"
+        },
         isDeleted: { type: Boolean, default: false },
     },
     { timestamps: true }

@@ -30,6 +30,9 @@ class GymProgramController {
                 anchorDate: program.anchorDate,
                 sequence: program.sequence,
                 routineTemplates,
+                scheduleType: program.scheduleType,
+                weeklySchedule: program.weeklySchedule,
+                weekStartDay: program.weekStartDay,
             });
         } catch (err) {
             console.error('Gym program fetch error:', err);
@@ -44,7 +47,7 @@ class GymProgramController {
      */
     async syncProgram(req, res) {
         try {
-            const { clientSideId, programName, anchorDate, sequence, routineTemplates } = req.body;
+            const { clientSideId, programName, anchorDate, sequence, routineTemplates, scheduleType, weeklySchedule, weekStartDay } = req.body;
 
             if (!clientSideId) {
                 return res.status(400).json({ error: 'clientSideId is required.' });
@@ -67,6 +70,9 @@ class GymProgramController {
                     anchorDate: anchorDate || '',
                     sequence: sequence || [],
                     routineTemplates: templatesMap,
+                    scheduleType: scheduleType || 'rolling',
+                    weeklySchedule: weeklySchedule || {},
+                    weekStartDay: weekStartDay || 'Monday',
                     updatedAt: Date.now(),
                 },
                 { upsert: true, new: true, runValidators: true }
@@ -86,6 +92,9 @@ class GymProgramController {
                 anchorDate: program.anchorDate,
                 sequence: program.sequence,
                 routineTemplates: responseTemplates,
+                scheduleType: program.scheduleType,
+                weeklySchedule: program.weeklySchedule,
+                weekStartDay: program.weekStartDay,
             });
         } catch (err) {
             console.error('Gym program sync error:', err);
