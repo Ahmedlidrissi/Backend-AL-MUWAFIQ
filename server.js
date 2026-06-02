@@ -4,6 +4,9 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const port = process.env.PORT || 5000;
 
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server is running smoothly on port ${PORT}`);
+});
 // Route imports
 const authRoutes = require('./routes/auth');
 const taskRoutes = require('./routes/tasks');
