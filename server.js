@@ -21,10 +21,18 @@ app.use('/api/tasks', taskRoutes);
 app.use('/api/gym', gymRoutes);
 app.use('/api/deen', deenRoutes);
 
-// Health check
-app.get('/api/health', (_req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
+// ─── Health Check (public – no auth) ─────────────────────────────────────────
+const healthPayload = (_req, res) => {
+    const dbStates = ['disconnected', 'connected', 'connecting', 'disconnecting'];
+    res.json({
+        status: 'ok',
+        uptime: process.uptime(),
+        timestamp: new Date().toISOString(),
+        database: dbStates[mongoose.connection.readyState] || 'unknown',
+    });
+};
+app.get('/health', healthPayload);
+app.get('/api/health', healthPayload);
 
 // ─── Start ───────────────────────────────────────────────────────────────────
 
